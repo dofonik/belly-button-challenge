@@ -33,33 +33,39 @@ function init(){
         console.log(first_entry);
     
         //Call the graph functions with the first entry (id 940)
-        makeBar(first_entry);
-        makeBubble(first_entry);
-        makeDemographics(first_entry);
+        CreateBar(first_entry);
+        CreateBubble(first_entry);
+        CreateDemographics(first_entry);
     });
 };
 
-// Horizontal bar chart function
-function makeBar(sample){
+//Declare Horizontal bar chart function
+function CreateBar(sample){
 
-    // Access the sample data for populating the bar chart
+    //Access sample data with d3 to populate bar chart
     d3.json(url).then((data) => {
-
+        
+        //Extract samples array from data
         let sample_data = data.samples;
-        // Apply a filter that matches based on sample id
+
+        //Filter through array based on sample id
         let results = sample_data.filter(id => id.id == sample);
-        // Access and store the first entry in results filter
+
+        //Access first entry in filtered results
         let first_result = results[0];
+        //Debug console log
         console.log(first_result);
-        // Store the first 10 results to display in the bar chart
+
+        //Extract first 10 elements
         let sample_values = first_result.sample_values.slice(0,10);
         let otu_ids = first_result.otu_ids.slice(0,10);
         let otu_labels = first_result.otu_labels.slice(0,10);
+        //Debug
         console.log(sample_values);
         console.log(otu_ids);
         console.log(otu_labels);
 
-        // Create the trace for bar chart
+        //Define the trace for bar chart
         let bar_trace = {
             x: sample_values.reverse(),
             y: otu_ids.map(item => `OTU ${item}`).reverse(),
@@ -68,30 +74,39 @@ function makeBar(sample){
             orientation: 'h'
         };
 
-        let layout = {title: "Top Ten OTUs"};
+        //Add chart title and plot
+        let layout = {title: "Top Ten OTUs Chart"};
         Plotly.newPlot("bar", [bar_trace], layout);
     });
 };
 
-// Bubble chart function
-function makeBubble(sample){
-    // Access the sample data for populating the bubble chart
+//Declare Bubble chart function
+function CreateBubble(sample){
+
+    //Access sample data with d3 to populate bubble chart
     d3.json(url).then((data) => {
+
+        //Extract samples array from data
         let sample_data = data.samples;
-        // Apply a filter that matches based on sample id
+
+        //Filter through array based on sample id
         let results = sample_data.filter(id => id.id == sample);
-        // Access and store the first entry in results filter
+
+        //Access first entry in filtered results
         let first_result = results[0];
+        //Debug
         console.log(first_result);
-        // Store the results to display in the bubble chart
+
+        //Extract data from first entry object
         let sample_values = first_result.sample_values;
         let otu_ids = first_result.otu_ids;
         let otu_labels = first_result.otu_labels;
+        //Debug
         console.log(sample_values);
         console.log(otu_ids);
         console.log(otu_labels);
 
-        // Create the trace for bubble chart
+        //Define the trace for bubble chart
         let bubble_trace = {
             x: otu_ids.reverse(),
             y: sample_values.reverse(),
@@ -103,46 +118,59 @@ function makeBubble(sample){
             }
         };
 
+        //Add chart and axis titles and plot
         let layout = {
-            title: "Bacteria Count for each Sample ID",
+            title: "Bacteria Count for Current ID",
             xaxis: {title: 'OTU ID'},
-            yaxis: {title: 'Number of Bacteria'}
+            yaxis: {title: 'Bacteria Count'}
         };
-        Plotly.newPlot("bubble", [bubble_trace], layout); //'bubble' is the html tag in index.html
+        Plotly.newPlot("bubble", [bubble_trace], layout);
     });
 };
 
-// Demographic info function
-function makeDemographics(sample){
-    // Access the sample data for populating the demographics section
-    d3.json(url).then((data) => {
-    // Access the demographic info (metadata) with d3
-    let demographic_info = data.metadata;
-    // Apply a filter that matches based on sample id
-    let results = demographic_info.filter(id => id.id == sample);
-    // Store the first result to display in demographic info
-    let first_result = results[0];
-    console.log(first_result);
-    // Clear out previous entries in the demographic info section by setting the text to a blank string
-    d3.select('#sample-metadata').text('');
+//Declare Demographic info function
+function CreateDemographics(sample){
 
-    Object.entries(first_result).forEach(([key,value]) => {
-        console.log(key,value);
-        // Select the demographic info html section with d3 and append new key-value pair
-        d3.select('#sample-metadata').append('h3').text(`${key}, ${value}`);
-    });
+    //Access metadata with d3 to populate demographics section
+    d3.json(url).then((data) => {
+
+        //Extract demographic (metadata)
+        let demographic_info = data.metadata;
+
+        //Filter through array based on sample id
+        let results = demographic_info.filter(id => id.id == sample);
+
+        //Access first entry to display in demographic info
+        let first_result = results[0];
+        //Debug console log
+        console.log(first_result);
+
+        //Clear previous entries in demographic info section by setting the text to a blank string
+        d3.select('#sample-metadata').text('');
+
+        //Iterate over entry key/value pairs
+        Object.entries(first_result).forEach(([key,value]) => {
+
+            //Debug console log
+            console.log(key,value);
+
+            //Append key/value pair to demographic info html section
+            d3.select('#sample-metadata').append('h3').text(`${key}, ${value}`);
+        });
     
     });
 };
 
-// Define the function when the dropdown detects a change (function name as defined in index.html)
+//Declare function for when dropdown changes (function name defined in index.html)
 function optionChanged(value){
-    // Log the value for debug
+
+    //Debug
     console.log(value);
-    makeBar(value);
-    makeBubble(value);
-    makeDemographics(value);
+
+    CreateBar(value);
+    CreateBubble(value);
+    CreateDemographics(value);
 };
 
-// Initialize the application
+//Application initialise
 init();
